@@ -8,7 +8,9 @@ Current functionalities include:
 Functionalities to be added:
 1) Sorting passwords by name
 - i.e. Given a set of passwords
+
 {'google-stellarium01','google-stellarium02', 'github-stellarium01'}
+
 You can sort by 'google' and retrieve
 {'stellarium01', 'stellarium02'}
     
