@@ -1,4 +1,9 @@
-public class MessageFiller {
+public class helper {
+    public static void clear() {
+        for (int i = 0; i < 15; i++) {
+            System.out.println();
+        }
+    }
     public static String fillMessage(String message, int length) {
         if (length < 0) {
             return fillMessage(message, message.length() - length);

@@ -1,3 +1,3 @@
 c:\
-cd C:\Users\19493\Documents\VSCode\Password Manager\src
-start java -jar manager.jar
+cd C:\Users\Stella\Documents\GitHub\password-manager\src
+start java -jar password_manager.jar
