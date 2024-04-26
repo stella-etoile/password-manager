@@ -113,6 +113,7 @@ public class manager {
                         File f = new File(e);
                         f.delete();
                         printed = true;
+                        System.out.println(Decryption.decrypt(wslist.get(wname)));
                         break;
                     }
                 }   
