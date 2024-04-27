@@ -1,3 +1,2 @@
-c:\
-cd C:\Users\Stella\Documents\GitHub\password-manager\src
+cd .
 start java -jar password_manager.jar
