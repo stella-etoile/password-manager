@@ -1,2 +1,2 @@
 cd .
-start java -jar manager.jar
+start java -jar password_manager.jar

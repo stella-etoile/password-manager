@@ -1,1 +1,2 @@
+javac -jar *.java
 jar cfve manager.jar manager *.class
