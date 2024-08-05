@@ -32,6 +32,7 @@ public class manager {
     final static int CHNG_PWD = 3;
     final static int EXIT = 4;
     final static HashSet<Integer> valid_cmds = new HashSet<Integer>(Arrays.asList(REC_PWD, ADD_PWD, CHNG_PWD, EXIT));
+    final static String FILE_NAME = "list.txt";
     public static void main(String[] args) throws IOException, InterruptedException {
         // reads input
         Scanner input = new Scanner(System.in);
@@ -57,7 +58,7 @@ public class manager {
         
         // option: 1, recovering password
         if (ans == REC_PWD) {
-            Scanner listRead = new Scanner(new File("list.txt"));
+            Scanner listRead = new Scanner(new File(FILE_NAME));
             HashMap<String, String> wslist = new HashMap<>();
             while (listRead.hasNextLine()) {
                 String line = listRead.nextLine();
@@ -71,13 +72,27 @@ public class manager {
                 i++;
             }
 
-            System.out.println();
-            System.out.println("Enter the index or the name of the website you wish to retrieve the password of: ");
-            // index of or the name of the website
-            String ws = input.nextLine();
             int index = -1;
-
+            String ws;
             while (true) {
+                System.out.println();
+                System.out.println("Enter the index or the name of the website you wish to retrieve the password of (or '-' to search): ");
+                // index of or the name of the website
+                ws = input.nextLine();
+
+                if (ws.equals("-")) {
+                    i = 1;
+                    System.out.println("Enter the name of the website you are trying to sort: ");
+                    String search = input.nextLine();
+                    for (String wname : wslist.keySet()) {
+                        if (wname.toLowerCase().contains(search.toLowerCase())) {
+                            System.out.println(i + ": " + wname);
+                        }
+                        i++;
+                    }
+                    continue;
+                }
+
                 try {
                     index = Integer.parseInt(ws);
                     if (index <= 0 && index > wslist.size()) {
@@ -113,7 +128,7 @@ public class manager {
                         File f = new File(e);
                         f.delete();
                         printed = true;
-                        System.out.println(Decryption.decrypt(wslist.get(wname)));
+                        // System.out.println(Decryption.decrypt(wslist.get(wname)));
                         break;
                     }
                 }   
@@ -145,7 +160,7 @@ public class manager {
         }
         else if (ans == ADD_PWD) {
             // import list
-            Scanner listRead = new Scanner(new File("list.txt"));
+            Scanner listRead = new Scanner(new File(FILE_NAME));
             HashMap<String, String> wslist = new HashMap<>();
             while (listRead.hasNextLine()) {
                 String line = listRead.nextLine();
@@ -201,7 +216,7 @@ public class manager {
             f.delete();
             wslist.put(ws, epw);
 
-            PrintWriter listExport = new PrintWriter("list.txt");
+            PrintWriter listExport = new PrintWriter(FILE_NAME);
             for (String wname : wslist.keySet()) {
                 listExport.println(wname + " " + wslist.get(wname));
             }
@@ -209,7 +224,7 @@ public class manager {
         }
         else if (ans == CHNG_PWD) {
             // import list
-            Scanner listRead = new Scanner(new File("list.txt"));
+            Scanner listRead = new Scanner(new File(FILE_NAME));
             HashMap<String, String> wslist = new HashMap<>();
             while (listRead.hasNextLine()) {
                 String line = listRead.nextLine();
