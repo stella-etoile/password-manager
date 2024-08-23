@@ -27,242 +27,130 @@ import java.util.concurrent.TimeUnit;
 */
 
 public class manager {
-    final static int REC_PWD = 1;
-    final static int ADD_PWD = 2;
-    final static int CHNG_PWD = 3;
-    final static int EXIT = 4;
-    final static HashSet<Integer> valid_cmds = new HashSet<Integer>(Arrays.asList(REC_PWD, ADD_PWD, CHNG_PWD, EXIT));
-    final static String FILE_NAME = "list.txt";
+    private final static int REC_PWD = 1;
+    private final static int ADD_PWD = 2;
+    private final static int CHNG_PWD = 3;
+    private final static int CHNG_TGT = 4;
+    private final static int EXIT = 4;
+    private final static HashSet<Integer> valid_cmds = new HashSet<Integer>(Arrays.asList(REC_PWD, ADD_PWD, CHNG_PWD, CHNG_TGT, EXIT));
+    private final static String LIST_NAMES = "list-names.txt";
+    private final static String FILE_NAME = "list.txt";
+    private final static String TARGET = "";
+    private static boolean first_time_setup = false;
     public static void main(String[] args) throws IOException, InterruptedException {
-        // reads input
+        // reads user input
         Scanner input = new Scanner(System.in);
 
-        // reads option line
-        String str_ans = "";
-        int ans = -1;
-        System.out.println("Enter a command: Recover password (1), Add password (2), Change password (3), Exit (4)");
-        str_ans = input.nextLine();
-        try {
-            ans = Integer.parseInt(str_ans);
-            // if not valid command, throws an exception
-            if (! valid_cmds.contains(ans)) {
-                throw new InvalidInputException("Invalid command.");
-            }
-        }
-        catch (Exception e) {
-            // exception clears the screen, prints the error, and reruns the program
-            helper.clear();
-            System.out.println(e);
-            manager.main(args);
-        }
+        // import list names
+        Scanner lists = new Scanner(new File(LIST_NAMES));
+        HashMap<Integer, String> names = new HashMap<>();
+        int i = 1;
         
-        // option: 1, recovering password
-        if (ans == REC_PWD) {
-            Scanner listRead = new Scanner(new File(FILE_NAME));
-            HashMap<String, String> wslist = new HashMap<>();
-            while (listRead.hasNextLine()) {
-                String line = listRead.nextLine();
-                wslist.put(line.split(" ")[0], line.split(" ")[1]);
+        // stores in hashmap
+        while (lists.hasNextLine()) {
+            String cur = lists.nextLine();
+            if (cur.equals("first-time-setup")) {
+                first_time_setup = true;
+                break;
             }
-            helper.clear();
+            System.out.println(i + ": " + cur);
+            names.put(i, cur);
+            i++;
+        }
+        lists.close();
 
-            int i = 1;
-            for (String wname : wslist.keySet()) {
-                System.out.println(i + ": " + wname);
-                i++;
+        if (first_time_setup) {
+            Scanner README = new Scanner(new File("../README.md"));
+            while (README.hasNextLine()) {
+                System.out.println(README.nextLine());
             }
+        }
+        else {
+            // asks to choose a target list
+            System.out.println("Set up your default target file.");
+            String str_ans = "";
+            int ans = -1;
 
-            int index = -1;
-            String ws;
-            while (true) {
-                System.out.println();
-                System.out.println("Enter the index or the name of the website you wish to retrieve the password of (or '-' to search): ");
-                // index of or the name of the website
-                ws = input.nextLine();
-
-                if (ws.equals("-")) {
-                    i = 1;
-                    System.out.println("Enter the name of the website you are trying to sort: ");
-                    String search = input.nextLine();
-                    for (String wname : wslist.keySet()) {
-                        if (wname.toLowerCase().contains(search.toLowerCase())) {
-                            System.out.println(i + ": " + wname);
-                        }
-                        i++;
-                    }
-                    continue;
-                }
-
+            if (! names.containsValue(str_ans)) {
                 try {
-                    index = Integer.parseInt(ws);
-                    if (index <= 0 && index > wslist.size()) {
-                        System.out.println("Invalid index. Enter the index or the name of the website you wish to retrieve the password of: ");
-                        ws = input.nextLine();
-                    }
-                    else {
-                        break;
+                    ans = Integer.parseInt(str_ans);
+                    // if not valid command, throws an exception
+                    if (! valid_cmds.contains(ans)) {
+                        input.close();
+                        throw new InvalidInputException("Invalid index/name");
                     }
                 }
                 catch (Exception e) {
-                    break;
+                    // exception clears the screen, prints the error, and reruns the program
+                    helper.clear();
+                    System.out.println(e);
+                    manager.main(args);
                 }
             }
 
-            boolean printed = false;
-
-            if (index != -1) {
-                int j = 0;
-                for (String wname : wslist.keySet()) {
-                    j++;
-
-                    if (index == j) {
-                        String e = Encryption.encrypt(wname, (int) (Math.random()*14+33));
-                        e = e.replaceAll("[^a-zA-Z0-9]","");
-                        e += ".txt";
-                        PrintWriter tempFile = new PrintWriter(e);
-                        tempFile.println(Decryption.decrypt(wslist.get(wname)));
-                        tempFile.close();
-                        Runtime runtime = Runtime.getRuntime();
-                        Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe " + e);
-                        TimeUnit.MILLISECONDS.sleep(500);
-                        File f = new File(e);
-                        f.delete();
-                        printed = true;
-                        // System.out.println(Decryption.decrypt(wslist.get(wname)));
-                        break;
-                    }
-                }   
-            }
-
-            if (!printed) {
-                for (String wname : wslist.keySet()) {
-                    if (wname.equalsIgnoreCase(ws)) {
-                        String e = Encryption.encrypt(wname, (int) (Math.random()*14+33));
-                        e = e.replaceAll("[^a-zA-Z0-9]","");
-                        e += ".txt";
-                        PrintWriter tempFile = new PrintWriter(e);
-                        tempFile.println(Decryption.decrypt(wslist.get(wname)));
-                        tempFile.close();
-                        Runtime runtime = Runtime.getRuntime();
-                        Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe " + e);
-                        TimeUnit.MILLISECONDS.sleep(500);
-                        File f = new File(e);
-                        f.delete();
-                        printed = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!printed) {
-                System.out.println("No index/website with value \"" + ws + "\" found.");
-            }
-        }
-        else if (ans == ADD_PWD) {
-            // import list
-            Scanner listRead = new Scanner(new File(FILE_NAME));
-            HashMap<String, String> wslist = new HashMap<>();
-            while (listRead.hasNextLine()) {
-                String line = listRead.nextLine();
-                wslist.put(line.split(" ")[0], line.split(" ")[1]);
-            }
-            listRead.close();
-
-            System.out.println("Enter the name of the website (for sorting purposes 'website-username' is optimal - i.e. google-stellarium");
-            System.out.println("and please refrain from using '-' instead of spaces and use '.' instead): ");
-            String ws = input.nextLine();
-            while (wslist.containsKey(ws)) {
-                System.out.println("The password manager contains a password for \""+ws+"\" already. Please enter another website or type 'c' to continue with replacing the previous value.");
-                String res = input.nextLine();
-                if (res.equals("c")) {
-                    break;
-                }
-                else {
-                    ws = res;
-                }
-            }
-
-            System.out.println("Enter the password for \"" + ws + "\" (enter 0 to generate a random password): ");
-            String pw = input.nextLine();
-            int len = -1;
-            
-            // int token = (int) (Math.random()*67+33);
-            int token = (int) (Math.random()*14+33);
-
+            // reads option line
+            str_ans = "";
+            ans = -1;
+            System.out.println("Enter a command: Recover password (1), Add password (2), Change password (3), Exit (4)");
+            str_ans = input.nextLine();
             try {
-                if (Integer.parseInt(pw) == 0) {
-                    System.out.println("How long do you want your password to be?");
-
-                    // TODO: need clause to error check length
-                    len = Integer.parseInt(input.nextLine());
-
-                    // idk why it's in a while block, need to check interactions and can remove if needed
-                    while (pw.equals("0")) {
-                        pw = RandomPassword.generatePassword(len);
-                    }
+                ans = Integer.parseInt(str_ans);
+                // if not valid command, throws an exception
+                if (! valid_cmds.contains(ans)) {
+                    throw new InvalidInputException("Invalid command.");
                 }
             }
             catch (Exception e) {
+                // exception clears the screen, prints the error, and reruns the program
+                helper.clear();
+                System.out.println(e);
+                manager.main(args);
             }
-
-            String epw = Encryption.encrypt(pw, token);
-            PrintWriter tempFile = new PrintWriter("temp.txt");
-            tempFile.println("The password for " + ws + " is " + pw);
-            tempFile.close();
-            Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe temp.txt");
-            TimeUnit.MILLISECONDS.sleep(500);
-            File f = new File("temp.txt");
-            f.delete();
-            wslist.put(ws, epw);
-
-            PrintWriter listExport = new PrintWriter(FILE_NAME);
-            for (String wname : wslist.keySet()) {
-                listExport.println(wname + " " + wslist.get(wname));
-            }
-            listExport.close();
-        }
-        else if (ans == CHNG_PWD) {
-            // import list
+            
             Scanner listRead = new Scanner(new File(FILE_NAME));
-            HashMap<String, String> wslist = new HashMap<>();
-            while (listRead.hasNextLine()) {
-                String line = listRead.nextLine();
-                wslist.put(line.split(" ")[0], line.split(" ")[1]);
-            }
-            listRead.close();
+            // option: 1, recovering password
+            if (ans == REC_PWD) {
+                HashMap<String, String> wslist = new HashMap<>();
+                while (listRead.hasNextLine()) {
+                    String line = listRead.nextLine();
+                    wslist.put(line.split(" ")[0], line.split(" ")[1]);
+                }
+                helper.clear();
 
-            String ws = "";
-
-            while (true) {
-                int i = 1;
+                i = 1;
                 for (String wname : wslist.keySet()) {
                     System.out.println(i + ": " + wname);
                     i++;
                 }
 
-                System.out.println("Enter the name or index of the website you want to change: ");
-                ws = input.nextLine();
                 int index = -1;
-                boolean isIndex = false;
-
+                String ws;
                 while (true) {
+                    System.out.println();
+                    System.out.println("Enter the index or the name of the website you wish to retrieve the password of (or '-' to search): ");
+                    // index of or the name of the website
+                    ws = input.nextLine();
+
+                    if (ws.equals("-")) {
+                        i = 1;
+                        System.out.println("Enter the name of the website you are trying to sort: ");
+                        String search = input.nextLine();
+                        for (String wname : wslist.keySet()) {
+                            if (wname.toLowerCase().contains(search.toLowerCase())) {
+                                System.out.println(i + ": " + wname);
+                            }
+                            i++;
+                        }
+                        continue;
+                    }
+
                     try {
                         index = Integer.parseInt(ws);
                         if (index <= 0 && index > wslist.size()) {
-                            System.out.println("Invalid index. Enter the name or index of the website you want to change: ");
+                            System.out.println("Invalid index. Enter the index or the name of the website you wish to retrieve the password of: ");
                             ws = input.nextLine();
                         }
                         else {
-                            int j = 1;
-                            for (String wname : wslist.keySet()) {
-                                if (j == index) {
-                                    ws = wname;
-                                    break;
-                                }
-                                j++;
-                            }
-                            isIndex = true;
                             break;
                         }
                     }
@@ -270,64 +158,228 @@ public class manager {
                         break;
                     }
                 }
-    
-                while (! wslist.containsKey(ws) && ! isIndex) {
-                    System.out.println("The password manager doesn't have a password for \""+ws+"\" already.");
-                    System.out.println("Enter the name or index of the website you want to change: ");
-                    String res = input.nextLine();
-                    ws = res;
+
+                boolean printed = false;
+
+                if (index != -1) {
+                    int j = 0;
+                    for (String wname : wslist.keySet()) {
+                        j++;
+
+                        if (index == j) {
+                            String e = Encryption.encrypt(wname, (int) (Math.random()*14+33));
+                            e = e.replaceAll("[^a-zA-Z0-9]","");
+                            e += ".txt";
+                            PrintWriter tempFile = new PrintWriter(e);
+                            tempFile.println(Decryption.decrypt(wslist.get(wname)));
+                            tempFile.close();
+                            Runtime runtime = Runtime.getRuntime();
+                            Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe " + e);
+                            TimeUnit.MILLISECONDS.sleep(500);
+                            File f = new File(e);
+                            f.delete();
+                            printed = true;
+                            // System.out.println(Decryption.decrypt(wslist.get(wname)));
+                            break;
+                        }
+                    }   
                 }
 
-                System.out.println("Can you confirm the website you are trying to change is \""+ws+"\"? Type 'y'");
-                if (input.nextLine().equals("y")) {
-                    break;
-                }
-            }
-
-            System.out.println("Enter the password for \"" + ws + "\" (enter 0 to generate a random password): ");
-            String pw = input.nextLine();
-            int len = -1;
-            
-            // int token = (int) (Math.random()*67+33);
-            int token = (int) (Math.random()*14+33);
-
-            try {
-                if (Integer.parseInt(pw) == 0) {
-                    System.out.println("How long do you want your password to be?");
-
-                    // TODO: need clause to error check length
-                    len = Integer.parseInt(input.nextLine());
-
-                    // idk why it's in a while block, need to check interactions and can remove if needed
-                    while (pw.equals("0")) {
-                        pw = RandomPassword.generatePassword(len);
+                if (!printed) {
+                    for (String wname : wslist.keySet()) {
+                        if (wname.equalsIgnoreCase(ws)) {
+                            String e = Encryption.encrypt(wname, (int) (Math.random()*14+33));
+                            e = e.replaceAll("[^a-zA-Z0-9]","");
+                            e += ".txt";
+                            PrintWriter tempFile = new PrintWriter(e);
+                            tempFile.println(Decryption.decrypt(wslist.get(wname)));
+                            tempFile.close();
+                            Runtime runtime = Runtime.getRuntime();
+                            Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe " + e);
+                            TimeUnit.MILLISECONDS.sleep(500);
+                            File f = new File(e);
+                            f.delete();
+                            printed = true;
+                            break;
+                        }
                     }
                 }
+
+                if (!printed) {
+                    System.out.println("No index/website with value \"" + ws + "\" found.");
+                }
             }
-            catch (Exception e) {
+            else if (ans == ADD_PWD) {
+                // import list
+                HashMap<String, String> wslist = new HashMap<>();
+                while (listRead.hasNextLine()) {
+                    String line = listRead.nextLine();
+                    wslist.put(line.split(" ")[0], line.split(" ")[1]);
+                }
+                listRead.close();
+
+                System.out.println("Enter the name of the website (for sorting purposes 'website-username' is optimal - i.e. google-stellarium");
+                System.out.println("and please refrain from using '-' instead of spaces and use '.' instead): ");
+                String ws = input.nextLine();
+                while (wslist.containsKey(ws)) {
+                    System.out.println("The password manager contains a password for \""+ws+"\" already. Please enter another website or type 'c' to continue with replacing the previous value.");
+                    String res = input.nextLine();
+                    if (res.equals("c")) {
+                        break;
+                    }
+                    else {
+                        ws = res;
+                    }
+                }
+
+                System.out.println("Enter the password for \"" + ws + "\" (enter 0 to generate a random password): ");
+                String pw = input.nextLine();
+                int len = -1;
+                
+                // int token = (int) (Math.random()*67+33);
+                int token = (int) (Math.random()*14+33);
+
+                try {
+                    if (Integer.parseInt(pw) == 0) {
+                        System.out.println("How long do you want your password to be?");
+
+                        // TODO: need clause to error check length
+                        len = Integer.parseInt(input.nextLine());
+
+                        // idk why it's in a while block, need to check interactions and can remove if needed
+                        while (pw.equals("0")) {
+                            pw = RandomPassword.generatePassword(len);
+                        }
+                    }
+                }
+                catch (Exception e) {
+                }
+
+                String epw = Encryption.encrypt(pw, token);
+                PrintWriter tempFile = new PrintWriter("temp.txt");
+                tempFile.println("The password for " + ws + " is " + pw);
+                tempFile.close();
+                Runtime runtime = Runtime.getRuntime();
+                Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe temp.txt");
+                TimeUnit.MILLISECONDS.sleep(500);
+                File f = new File("temp.txt");
+                f.delete();
+                wslist.put(ws, epw);
+
+                PrintWriter listExport = new PrintWriter(FILE_NAME);
+                for (String wname : wslist.keySet()) {
+                    listExport.println(wname + " " + wslist.get(wname));
+                }
+                listExport.close();
+            }
+            else if (ans == CHNG_PWD) {
+                // import list
+                HashMap<String, String> wslist = new HashMap<>();
+                while (listRead.hasNextLine()) {
+                    String line = listRead.nextLine();
+                    wslist.put(line.split(" ")[0], line.split(" ")[1]);
+                }
+                listRead.close();
+
+                String ws = "";
+
+                while (true) {
+                    i = 1;
+                    for (String wname : wslist.keySet()) {
+                        System.out.println(i + ": " + wname);
+                        i++;
+                    }
+
+                    System.out.println("Enter the name or index of the website you want to change: ");
+                    ws = input.nextLine();
+                    int index = -1;
+                    boolean isIndex = false;
+
+                    while (true) {
+                        try {
+                            index = Integer.parseInt(ws);
+                            if (index <= 0 && index > wslist.size()) {
+                                System.out.println("Invalid index. Enter the name or index of the website you want to change: ");
+                                ws = input.nextLine();
+                            }
+                            else {
+                                int j = 1;
+                                for (String wname : wslist.keySet()) {
+                                    if (j == index) {
+                                        ws = wname;
+                                        break;
+                                    }
+                                    j++;
+                                }
+                                isIndex = true;
+                                break;
+                            }
+                        }
+                        catch (Exception e) {
+                            break;
+                        }
+                    }
+        
+                    while (! wslist.containsKey(ws) && ! isIndex) {
+                        System.out.println("The password manager doesn't have a password for \""+ws+"\" already.");
+                        System.out.println("Enter the name or index of the website you want to change: ");
+                        String res = input.nextLine();
+                        ws = res;
+                    }
+
+                    System.out.println("Can you confirm the website you are trying to change is \""+ws+"\"? Type 'y'");
+                    if (input.nextLine().equals("y")) {
+                        break;
+                    }
+                }
+
+                System.out.println("Enter the password for \"" + ws + "\" (enter 0 to generate a random password): ");
+                String pw = input.nextLine();
+                int len = -1;
+                
+                // int token = (int) (Math.random()*67+33);
+                int token = (int) (Math.random()*14+33);
+
+                try {
+                    if (Integer.parseInt(pw) == 0) {
+                        System.out.println("How long do you want your password to be?");
+
+                        // TODO: need clause to error check length
+                        len = Integer.parseInt(input.nextLine());
+
+                        // idk why it's in a while block, need to check interactions and can remove if needed
+                        while (pw.equals("0")) {
+                            pw = RandomPassword.generatePassword(len);
+                        }
+                    }
+                }
+                catch (Exception e) {
+                }
+
+                String epw = Encryption.encrypt(pw, token);
+                PrintWriter tempFile = new PrintWriter("temp.txt");
+                tempFile.println("The password for " + ws + " is " + pw);
+                tempFile.close();
+                Runtime runtime = Runtime.getRuntime();
+                Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe temp.txt");
+                TimeUnit.MILLISECONDS.sleep(500);
+                File f = new File("temp.txt");
+                f.delete();
+                wslist.put(ws, epw);
+
+                PrintWriter listExport = new PrintWriter("list.txt");
+                for (String wname : wslist.keySet()) {
+                    listExport.println(wname + " " + wslist.get(wname));
+                }
+                listExport.close();
             }
 
-            String epw = Encryption.encrypt(pw, token);
-            PrintWriter tempFile = new PrintWriter("temp.txt");
-            tempFile.println("The password for " + ws + " is " + pw);
-            tempFile.close();
-            Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe temp.txt");
-            TimeUnit.MILLISECONDS.sleep(500);
-            File f = new File("temp.txt");
-            f.delete();
-            wslist.put(ws, epw);
+            // if (ans != EXIT) {
+            //     helper.clear();
+            //     manager.main(args);
+            // }
 
-            PrintWriter listExport = new PrintWriter("list.txt");
-            for (String wname : wslist.keySet()) {
-                listExport.println(wname + " " + wslist.get(wname));
-            }
-            listExport.close();
-        }
-
-        if (ans != EXIT) {
-            helper.clear();
-            manager.main(args);
+            input.close();
         }
     }
 }
