@@ -4,6 +4,7 @@ public class helper {
             System.out.println();
         }
     }
+
     public static String fillMessage(String message, int length) {
         if (length < 0) {
             return fillMessage(message, message.length() - length);
@@ -26,5 +27,15 @@ public class helper {
             ret = " " + ret;
         }
         return ret;
+    }
+
+    public static void split(String message, int length) {
+        if (message.length() <= length) {
+            System.out.println(message);
+            return;
+        }
+        System.out.println(message.substring(0, length));
+        split(message.substring(length), length);
+        return;
     }
 }
