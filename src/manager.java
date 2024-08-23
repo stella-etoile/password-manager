@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 */
 
 // TODO: Update README.md
+// TODO: Update checker by checking last-updated.txt file
+// TODO: Allow for different file extensions
 
 public class manager {
     // CHANGE THIS
@@ -54,11 +56,13 @@ public class manager {
     // private final static String FILE_NAME = "list.txt";
     private static String TARGET = "";
     private static boolean first_time_setup = false;
+    private static boolean exit_all = false;
 
     // modes
     private final static String MAIN = "0";
     private final static String SETT = "1";
     // private static int EXEC = 0;
+
     @SuppressWarnings("resource")
     public static void main(String[] args) throws IOException, InterruptedException {
         // reads user input
@@ -96,10 +100,15 @@ public class manager {
 
             System.out.println();
             System.out.println("Here is the most up-to-date version of the README.md file associated with the program.");
-            
-            System.out.println();
-            System.out.println("It seems that this is your first time running this program.");
-            System.out.println("If this is a mistake, please check 'list-names.txt' or go to the menu to delete 'first-time-setup' from the first line of the list names.");
+
+            if (args.length > 0 && args[0].equals(Integer.toString(RESET))) {
+                System.out.println("Reset has been successfully completed.");
+            }
+            else {
+                System.out.println();
+                System.out.println("It seems that this is your first time running this program.");
+                System.out.println("If this is a mistake, please check 'list-names.txt' or go to the menu to delete 'first-time-setup' from the first line of the list names.");
+            }
 
             System.out.println();
             boolean ready = false;
@@ -107,7 +116,7 @@ public class manager {
             String new_target = "";
             while (! ready) {
                 System.out.println();
-                System.out.println("Please provide the name of the file you want to be storing your username and passwords.");
+                System.out.println("Please provide the name of the file you want to be storing your username and passwords without the .txt extension..");
                 str_ans = input.nextLine();
                 new_target = str_ans+".txt";
                 System.out.println();
@@ -123,6 +132,7 @@ public class manager {
             update_names.close();
 
             helper.clear();
+            first_time_setup = false;
             manager.main(new String[] {MAIN});
         }
         else {
@@ -135,7 +145,7 @@ public class manager {
                 // }
             }
             else if (args.length == 2) {
-                TARGET = FOLDER+args[0];
+                TARGET = FOLDER+args[1];
             }
             // System.out.println(names.get(0));
         }
@@ -164,6 +174,7 @@ public class manager {
         else if (args[0].equals(SETT)) {
             ans = 4;
         }
+        System.out.println();
         
         Scanner listRead = new Scanner(new File(TARGET));
         // option: 1, recovering password
@@ -440,7 +451,7 @@ public class manager {
             ans = -1;
 
             System.out.println("You are currently browsing the file: " + TARGET);
-            System.out.println("Enter a command: Change default target file (1), Change target file (2), Reset lists indices (3), Add lists (4), Back (0)");
+            System.out.println("Enter a command: Change default target file (1), Change target file (2), Add lists (3), Reset lists indices (9), Back (0)");
             str_ans = input.nextLine();
 
             try {
@@ -456,6 +467,7 @@ public class manager {
                 System.out.println(e);
                 manager.main(new String[] {SETT});
             }
+            System.out.println();
 
             if (ans == CHNG_DEF) {
                 String new_def = "";
@@ -539,13 +551,43 @@ public class manager {
                 helper.clear();
                 manager.main(new String[] {MAIN, new_target});
             }
-            // TODO
-            else if (ans == ADD_LST) {}
-            // TODO
-            else if (ans == RESET) {}
+            else if (ans == ADD_LST) {
+                System.out.println("Enter the name of your new file without the .txt extension.");
+                String name = input.nextLine()+".txt";
+                System.out.println("Please type 'y' to confirm you want to add '" + name+"'.");
+                str_ans = input.nextLine();
+                if (str_ans.equalsIgnoreCase("y")) {
+                    PrintWriter update_names = new PrintWriter("list-names.txt");
+                    for (i = 0; i < names.size(); i++) {
+                        update_names.println(names.get(i));
+                    }
+                    update_names.println(name);
+                    update_names.close();
+
+                    helper.clear();
+                    manager.main(new String[] {Integer.toString(RESET)});
+                }
+            }
+            else if (ans == RESET) {
+                // TODO: Implement Delete text file option
+                System.out.println("Your '" + LIST_NAMES + "' will be reset to its original state. To get rid of your passwords, please go to " + FOLDER + " and manually delete them or use the Reset Folder option.");
+                System.out.println("Please type 'y' to confirm resettings " + FOLDER+LIST_NAMES+".");
+                str_ans = input.nextLine();
+                if (str_ans.equalsIgnoreCase("y")) {
+                    PrintWriter update_names = new PrintWriter("list-names.txt");
+                    update_names.println("first-time-setup");
+                    update_names.close();
+
+                    helper.clear();
+                    manager.main(new String[] {Integer.toString(RESET)});
+                }
+            }
+        }
+        else if (ans == EXIT) {
+            exit_all = true;
         }
 
-        if (ans != EXIT) {
+        if (! (ans == EXIT || exit_all)) {
             helper.clear();
             manager.main(new String[]{MAIN});
         }
