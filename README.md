@@ -13,5 +13,6 @@ Current functionalities include:
 Functionalities to be added:
 1) Changing name of websites
     - i.e. Change from 'testwebsite1' to 'testwebsite2' after a typo
+
 Known bugs:
 1) None
