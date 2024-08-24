@@ -1,4 +1,4 @@
-NEWLY UPDATED PASSWORD MANAGER
+Password Manager (ver. 2.2.2)
 ---
 Current functionalities include:
 1) Recovering passwords
