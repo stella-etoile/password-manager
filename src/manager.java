@@ -1,6 +1,9 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,12 +28,8 @@ import java.util.concurrent.TimeUnit;
 
     Known bugs:
     1) Exit key doesn't work
-
-    CHECK README.MD FOR MORE UP-TO-DATE PATCHES
 */
 
-// TODO: Update README.md
-// TODO: Update checker by checking last-updated.txt file
 // TODO: Allow for different file extensions
 
 public class manager {
@@ -39,6 +38,11 @@ public class manager {
     private final static String FOLDER = "./lists/";
 
     // DON'T TOUCH BELOW
+    // README website link
+    // https://raw.githubusercontent.com/stella-etoile/password-manager/main/README.md
+    private final static String README = "https://raw.githubusercontent.com/stella-etoile/password-manager/main/README.md"; 
+    private final static String REPO = "https://github.com/stella-etoile/password-manager";
+
     // main menu
     private final static int REC_PWD = 1;
     private final static int ADD_PWD = 2;
@@ -64,10 +68,36 @@ public class manager {
     // private static int EXEC = 0;
 
     @SuppressWarnings("resource")
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
         // reads user input
         Scanner input = new Scanner(System.in);
         // System.out.println(Arrays.toString(args));
+
+        Scanner last_update = new Scanner(new File("last-updated.txt"));
+        String cur_ver = last_update.nextLine();
+
+        Scanner read_README = new Scanner(new URL(README).openStream());
+        String latest_ver = read_README.nextLine();
+        read_README.close();
+        latest_ver = latest_ver.substring("Password Manager (ver. ".length(), latest_ver.length()-1);
+
+        String str_ans = "";
+
+        if (! cur_ver.substring(cur_ver.length()-1).equals("I") && ! cur_ver.equals(latest_ver)) {
+            System.out.println("You are on version " + cur_ver + ". The latest version is " + latest_ver + ".");
+            System.out.println("Please visit " + REPO + " to update your password manager.");
+            System.out.println("Type 'y' to open up a page of the repo. Type 'i' or 'ignore' to ignore this version.");
+            str_ans = input.nextLine();
+            if (str_ans.equals("y")) {
+                java.awt.Desktop.getDesktop().browse(new URI(REPO));
+            }
+            else if (str_ans.equals("i") || str_ans.equals("ignore")) {
+                PrintWriter update = new PrintWriter("last-updated.txt");
+                update.println(cur_ver+"I");
+                update.close();
+            }
+            System.out.println();
+        }
 
         // import list names
         Scanner lists = new Scanner(new File(LIST_NAMES));
@@ -88,7 +118,6 @@ public class manager {
         lists.close();
 
         // asks to choose a target list
-        String str_ans = "";
         int ans = -1;
 
         if (first_time_setup) {
@@ -122,7 +151,7 @@ public class manager {
                 System.out.println();
                 System.out.println("Your file name will be '" + new_target + "'. Please confirm with 'y'.");
                 str_ans = input.nextLine();
-                if (str_ans.equalsIgnoreCase("y")) {
+                if (str_ans.equals("y")) {
                     ready = true;
                 }
             }
@@ -557,7 +586,7 @@ public class manager {
                 String name = input.nextLine()+".txt";
                 System.out.println("Please type 'y' to confirm you want to add '" + name+"'.");
                 str_ans = input.nextLine();
-                if (str_ans.equalsIgnoreCase("y")) {
+                if (str_ans.equals("y")) {
                     PrintWriter update_names = new PrintWriter("list-names.txt");
                     for (i = 0; i < names.size(); i++) {
                         update_names.println(names.get(i));
@@ -574,7 +603,7 @@ public class manager {
                 System.out.println("Your '" + LIST_NAMES + "' will be reset to its original state. To get rid of your passwords, please go to " + FOLDER + " and manually delete them or use the Reset Folder option.");
                 System.out.println("Please type 'y' to confirm resettings " + FOLDER+LIST_NAMES+".");
                 str_ans = input.nextLine();
-                if (str_ans.equalsIgnoreCase("y")) {
+                if (str_ans.equals("y")) {
                     PrintWriter update_names = new PrintWriter("list-names.txt");
                     update_names.println("first-time-setup");
                     update_names.close();
