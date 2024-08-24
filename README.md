@@ -71,3 +71,4 @@
 ### Known bugs:
 1) Possible memory leaks if the program has too many iterations of itself (might need to look into using a global scanner for each iterations)
 2) There are sometimes when a .txt file created and deleted instantly so that the user can copy-paste the decrypted password doesn't actually get deleted.
+3) Ignore version ignores all future versions instead of only the next one.
