@@ -177,6 +177,7 @@ public class manager {
         System.out.println();
         
         Scanner listRead = new Scanner(new File(TARGET));
+        
         // option: 1, recovering password
         if (ans == REC_PWD) {
             HashMap<String, String> wslist = new HashMap<>();
