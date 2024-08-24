@@ -79,7 +79,7 @@ public class manager {
         Scanner read_README = new Scanner(new URL(README).openStream());
         String latest_ver = read_README.nextLine();
         read_README.close();
-        latest_ver = latest_ver.substring("Password Manager (ver. ".length(), latest_ver.length()-1);
+        latest_ver = latest_ver.substring("## Password Manager (ver. ".length(), latest_ver.length()-1);
 
         String str_ans = "";
 

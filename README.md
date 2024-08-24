@@ -1,4 +1,4 @@
-## Password Manager (ver. 2.3.0)
+## Password Manager (ver. 2.3.1)
 ### Current functionalities
 1) Recovering passwords
 2) Adding new passwords
@@ -23,6 +23,7 @@
     - i.e. Change from 'testwebsite1' to 'testwebsite2' after a typo
 2) Allow for different file extensions besides '.txt'
 3) Deleting password files if wanted
+4) Add a feature that updates 'last-updated.txt' when updated?
 
 ---
 ### Changelogs:
@@ -57,6 +58,12 @@
         - i.e. an instance within an instance
         - in such occasion, the program ran and looked for an input even though the input didn't exist
         - this was fixed by not closing the scanners until the program is finished executing (this might cause memory leaks? might need to look into using a global variable for scanner)
+#### 2.3.0 (Aug 24, 2024): added a functionality to check the Github repo for updates
+    6) Automatically checks the Github repo for updates
+        - Prompts with the Github repo link
+        - Respond with 'y' to open the link on your default broswer
+        - Respond with 'i' or 'ignore' to ignore this version
+#### 2.3.1 (Aug 24, 2024): bugfix for update checker not retrieving the version number correctly because of markdown texts
     
 
 ---
