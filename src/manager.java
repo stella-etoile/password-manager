@@ -83,7 +83,20 @@ public class manager {
 
         String str_ans = "";
 
-        if (! cur_ver.substring(cur_ver.length()-1).equals("I") && ! cur_ver.equals(latest_ver)) {
+        boolean contains = false;
+        String ignore_ver = "";
+
+        if (cur_ver.contains("i")) {
+            ignore_ver = cur_ver.substring(cur_ver.indexOf("i")+1);
+            // System.out.println("ignore: " + ignore_ver);
+            cur_ver = cur_ver.substring(0,cur_ver.indexOf("i"));
+            contains = true;
+        }
+
+        // System.out.println("cur: " + cur_ver);
+        // System.out.println("latest: " + latest_ver);
+
+        if ((contains && ! ignore_ver.equals(latest_ver)) && ! cur_ver.equals(latest_ver)) {
             System.out.println("You are on version " + cur_ver + ". The latest version is " + latest_ver + ".");
             System.out.println("Please visit " + REPO + " to update your password manager.");
             System.out.println("Type 'y' to open up a page of the repo. Type 'i' or 'ignore' to ignore this version.");
@@ -93,7 +106,7 @@ public class manager {
             }
             else if (str_ans.equals("i") || str_ans.equals("ignore")) {
                 PrintWriter update = new PrintWriter("last-updated.txt");
-                update.println(cur_ver+"I");
+                update.println(cur_ver+"i"+latest_ver);
                 update.close();
             }
             System.out.println();
@@ -276,6 +289,7 @@ public class manager {
                         Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe " + e);
                         TimeUnit.MILLISECONDS.sleep(500);
                         File f = new File(e);
+                        TimeUnit.MILLISECONDS.sleep(500);
                         f.delete();
                         printed = true;
                         // System.out.println(Decryption.decrypt(wslist.get(wname)));
@@ -298,6 +312,7 @@ public class manager {
                         Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe " + e);
                         TimeUnit.MILLISECONDS.sleep(500);
                         File f = new File(e);
+                        TimeUnit.MILLISECONDS.sleep(500);
                         f.delete();
                         printed = true;
                         process.destroy();
@@ -364,6 +379,7 @@ public class manager {
             Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe temp.txt");
             TimeUnit.MILLISECONDS.sleep(500);
             File f = new File("temp.txt");
+            TimeUnit.MILLISECONDS.sleep(500);
             f.delete();
             wslist.put(ws, epw);
 
@@ -466,6 +482,7 @@ public class manager {
             Process process = runtime.exec("C:\\WINDOWS\\system32\\notepad.exe temp.txt");
             TimeUnit.MILLISECONDS.sleep(500);
             File f = new File("temp.txt");
+            TimeUnit.MILLISECONDS.sleep(500);
             f.delete();
             wslist.put(ws, epw);
 

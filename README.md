@@ -5,9 +5,9 @@
 3) Changing previous passwords
 4) Sorting passwords by name
     - i.e. Given a set of passwords
-        - {'google-stellarium01','google-stellarium02', 'github-stellarium01'}
+        - {'google-test1','google-test2', 'github-test3'}
     - You can sort by 'google' and retrieve
-        - {'stellarium01', 'stellarium02'}
+        - {'test1', 'test2'}
 5) Multiple files access
     1) Set a default target file that your program launches into.
     2) Change the target file temporarily.
@@ -18,12 +18,13 @@
 
 ---
 
-### Functionalities to be added
-1) Changing name of websites
+### Functionalities to be added (higher priority at the top)
+1) Integration with Discord (**Currently WIP**)
+2) Deleting password files if wanted
+3) Changing name of websites
     - i.e. Change from 'testwebsite1' to 'testwebsite2' after a typo
-2) Allow for different file extensions besides '.txt'
-3) Deleting password files if wanted
-4) Add a feature that updates 'last-updated.txt' when updated?
+4) Allow for different file extensions besides '.txt'
+5) Add a feature that updates 'last-updated.txt' when updated?
 
 ---
 ### Changelogs:
@@ -64,10 +65,11 @@
         - Respond with 'y' to open the link on your default broswer
         - Respond with 'i' or 'ignore' to ignore this version
 #### 2.3.1 (Aug 24, 2024): bugfix for update checker not retrieving the version number correctly because of markdown texts
+
+#### 2.3.2 (Feb 17, 2025): bugfix for the password manager ignoring every update if they choose to ignore it once and added a delay before deleting the files in order to get around the files not being deleted 100% of the time
     
 
 ---
 
 ### Known bugs:
 1) Possible memory leaks if the program has too many iterations of itself (might need to look into using a global scanner for each iterations)
-2) There are sometimes when a .txt file created and deleted instantly so that the user can copy-paste the decrypted password doesn't actually get deleted.
