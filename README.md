@@ -1,4 +1,4 @@
-## Password Manager (ver. 2.3.1)
+## Password Manager (ver. 2.3.2)
 ### Current functionalities
 1) Recovering passwords
 2) Adding new passwords
